@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .box {
+            width: 270px;
+            height: 200px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            width: 70%;
+            font-size: 14px;
+            outline: none;
+        }
+        .btn {
+            border: none;
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: blueviolet;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            <div class="content">
+                <input type="text" class="input" id="original_link" placeholder="Enter URL">
+                <button class="btn" id="generate">Generate</button>
+            </div>
+            <div class="content">
+                <input type="text" class="input" id="shorten_link" readonly>
+                <button class="btn" id="copy">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const originalLink = document.getElementById("original_link");
+        const generateBtn = document.getElementById("generate");
+        const shortenLink = document.getElementById("shorten_link");
+        const copyBtn = document.getElementById("copy");
+
+        generateBtn.addEventListener("click", async () => {
+            const url = originalLink.value.trim();
+            if (url !== '') {
+                try {
+                    const response = await fetch(`https://api.shrtco.de/v2/shorten?url=${url}`);
+                    const data = await response.json();
+                    shortenLink.value = data.result.short_link;
+                } catch (error) {
+                    shortenLink.value = "Something went wrong!";
+                }
+            } else {
+                shortenLink.value = "Please enter a valid URL.";
+            }
+        });
+
+        copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(shortenLink.value)
+                .then(() => {
+                    copyBtn.innerHTML = "Copied!";
+                    setTimeout(() => {
+                        copyBtn.innerHTML = "Copy";
+                    }, 1000);
+                })
+                .catch(err => console.error('Unable to copy:', err));
+        });
+    </script>
+</body>
+</html>
